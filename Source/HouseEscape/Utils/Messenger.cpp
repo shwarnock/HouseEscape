@@ -1,0 +1,31 @@
+#include "Messenger.h"
+
+void UMessenger::CollideWithInteractable(FMessage message)
+{
+	OnCollideWithInteractable.Broadcast(message);
+}
+
+void UMessenger::EndCollideWithInteractable(FMessage message)
+{
+	OnEndCollideWithInteractable.Broadcast(message);
+}
+
+void UMessenger::RemoveAllWidgets()
+{
+	OnRemoveAllWidgets.Broadcast();
+}
+
+void UMessenger::PuzzleSolved(FMessage message)
+{
+	OnPuzzleSolved.Broadcast(message);
+}
+
+void UMessenger::KeyPickedUp(FMessage message)
+{
+	OnKeyPickedUp.Broadcast(message);
+}
+
+void UMessenger::ItemPickedUp(FMessage message)
+{
+	OnItemPickedUp.Broadcast(message);
+}
