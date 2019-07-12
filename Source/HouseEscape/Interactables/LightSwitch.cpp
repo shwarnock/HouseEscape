@@ -35,28 +35,7 @@ void ALightSwitch::OnInteract_Implementation()
 	}
 }
 
-void ALightSwitch::HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+ALightSwitch::ALightSwitch()
 {
-	if (!IsPlayerOverlapping())
-	{
-		return;
-	}
-
-	FMessage message;
-	message.interactableType = Interacts::LightSwitch;
-	messenger->CollideWithInteractable(message);
-	StaticMeshComponent->SetRenderCustomDepth(true);
-}
-
-void ALightSwitch::HandleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (IsPlayerOverlapping())
-	{
-		return;
-	}
-
-	FMessage message;
-	message.interactableType = Interacts::LightSwitch;
-	messenger->EndCollideWithInteractable(message);
-	StaticMeshComponent->SetRenderCustomDepth(false);
+	interactType = Interacts::LightSwitch;
 }

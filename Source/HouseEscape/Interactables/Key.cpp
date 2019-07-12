@@ -17,6 +17,8 @@ ADoorKey::ADoorKey()
 	RootComponent->SetRelativeScale3D(FVector(0.15f, 0.15f, 0.15f));
 	
 	BoxComponent->SetRelativeScale3D(FVector(10.0f, 9.75f, 9.5f));
+
+	interactType = Interacts::Key;
 }
 
 // Called when the game starts or when spawned
@@ -31,28 +33,6 @@ void ADoorKey::Tick(float DeltaTime)
 {
 	AInteractable::Tick(DeltaTime);
 
-}
-
-void ADoorKey::HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (IsPlayerOverlapping())
-	{
-		FMessage message;
-		message.interactableType = Interacts::Key;
-		messenger->CollideWithInteractable(message);
-		StaticMeshComponent->SetRenderCustomDepth(true);
-	}
-}
-
-void ADoorKey::HandleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (!IsPlayerOverlapping())
-	{
-		FMessage message;
-		message.interactableType = Interacts::Key;
-		messenger->EndCollideWithInteractable(message);
-		StaticMeshComponent->SetRenderCustomDepth(false);
-	}
 }
 
 void ADoorKey::OnInteract_Implementation()

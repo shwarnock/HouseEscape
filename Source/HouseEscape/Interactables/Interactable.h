@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Messenger.h"
 #include "SaveGameUtil.h"
+#include "Enums.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
@@ -13,8 +14,11 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/PrimitiveComponent.h"
+
 #include "InteractInterface.h"
 #include "Interactable.generated.h"
+
+class AHouseEscapeCharacter;
 
 UCLASS()
 class HOUSEESCAPE_API AInteractable : public AActor, public IInteractInterface
@@ -41,18 +45,26 @@ protected:
 
 	virtual void OnInteract_Implementation() override;
 
+	TEnumAsByte<Interacts> interactType;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	//Of the valid list of interactable targets, find the one closest to center of camera
+	static AInteractable* FindMostDesirableTarget(TArray<AInteractable*> interactables, AHouseEscapeCharacter* player);
+
+	void SetRenderDepth(bool setRender);
+
 protected:
 
+	UFUNCTION()
 	virtual void HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	UFUNCTION()
 	virtual void HandleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	bool IsPlayerOverlapping();
 
-private:
-	FGuid uniqueID;
+	FGuid uniqueId;
 };

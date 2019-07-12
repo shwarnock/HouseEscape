@@ -12,6 +12,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEndCollideWithInteractDelegate, FMe
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPuzzleSolvedDelegate, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FKeyPickedUpDelegate, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemPickedUpDelegate, FMessage, message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddInteractDelegate, FMessage, message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemoveInteractDelegate, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRemoveAllWidgetsDelegate);
 
 UCLASS(BlueprintType)
@@ -38,6 +40,12 @@ public:
 	UPROPERTY()
 	FItemPickedUpDelegate OnItemPickedUp;
 
+	UPROPERTY()
+	FAddInteractDelegate OnAddInteractTarget;
+
+	UPROPERTY()
+	FRemoveInteractDelegate OnRemoveInteract;
+
 public:
 	void CollideWithInteractable(FMessage message);
 	void EndCollideWithInteractable(FMessage message);
@@ -48,4 +56,7 @@ public:
 	void KeyPickedUp(FMessage message);
 
 	void ItemPickedUp(FMessage message);
+
+	void AddInteractTarget(FMessage message);
+	void RemoveInteractTarget(FMessage message);
 };

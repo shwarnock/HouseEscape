@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "MessageStruct.h"
 #include "ItemStruct.h"
+#include "Interactable.h"
 #include "HouseEscapeCharacter.generated.h"
 
 class UInputComponent;
@@ -39,6 +40,10 @@ public:
 	/** Returns FirstPersonCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
+	bool AnyCurrentTargets();
+
+	TArray<AInteractable*> GetCurrentTargets();
+
 protected:
 	virtual void BeginPlay();
 
@@ -69,8 +74,21 @@ protected:
 private:
 	const float InteractDistance = 300.0f;
 
+	UFUNCTION()
 	void HandleItemPickedUp(FMessage message);
 
 	TArray<FItem> items;
+
+	bool isOverlapping;
+
+	TArray<AInteractable*> currentTargets;
+
+	AInteractable* mostDesirableTarget;
+
+	UFUNCTION()
+	void AddInteractTarget(FMessage message);
+
+	UFUNCTION()
+	void RemoveInteractTarget(FMessage message);
 };
 

@@ -26,9 +26,5 @@ public:
 	void OnInteract();
 	virtual void OnInteract_Implementation() override;
 
-	UFUNCTION()
-	void HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
-
-	UFUNCTION()
-	void HandleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
+	ALightSwitch();
 };

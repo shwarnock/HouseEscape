@@ -7,11 +7,12 @@ void ADoor::HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* Othe
 	if (IsPlayerOverlapping())
 	{
 		FMessage message;
-		message.interactableType = Interacts::Door;
+		message.interactableType = interactType;
 		message.room = neededKey;
+		message.interact = this;
 		message.doorState = doorState;
 		messenger->CollideWithInteractable(message);
-		StaticMeshComponent->SetRenderCustomDepth(false);
+		messenger->AddInteractTarget(message);
 	}
 }
 
@@ -20,9 +21,10 @@ void ADoor::HandleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 	if (!IsPlayerOverlapping())
 	{
 		FMessage message;
-		message.interactableType = Interacts::Door;
+		message.interact = this;
+		message.interactableType = interactType;
 		messenger->EndCollideWithInteractable(message);
-		StaticMeshComponent->SetRenderCustomDepth(false);
+		messenger->RemoveInteractTarget(message);
 	}
 }
 
@@ -73,6 +75,8 @@ ADoor::ADoor()
 	FloatCurve = Curve.Object;
 
 	doorState = DoorStates::NoKey;
+
+	interactType = Interacts::Door;
 }
 
 void ADoor::BeginPlay()

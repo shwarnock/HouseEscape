@@ -5,6 +5,8 @@
 #include "ItemStruct.h"
 #include "MessageStruct.generated.h"
 
+class AInteractable;
+
 USTRUCT(BlueprintType)
 struct FMessage
 {
@@ -28,4 +30,7 @@ public:
 
 	UPROPERTY()
 	FGuid uniqueId;
+
+	UPROPERTY()
+	AInteractable* interact;
 };

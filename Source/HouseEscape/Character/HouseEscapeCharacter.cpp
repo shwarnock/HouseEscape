@@ -37,6 +37,9 @@ AHouseEscapeCharacter::AHouseEscapeCharacter()
 	StaticMesh->CastShadow = false;
 	StaticMesh->RelativeRotation = FRotator(1.9f, -19.19f, 5.2f);
 	StaticMesh->RelativeLocation = FVector(-0.5f, -4.4f, -155.7f);
+
+	isOverlapping = false;
+	mostDesirableTarget = nullptr;
 }
 
 void AHouseEscapeCharacter::BeginPlay()
@@ -48,6 +51,8 @@ void AHouseEscapeCharacter::BeginPlay()
 
 	UHouseEscapeGameInstance* gameInstance = Cast<UHouseEscapeGameInstance>(GetWorld()->GetGameInstance());
 	gameInstance->GetMessenger()->OnItemPickedUp.AddDynamic(this, &AHouseEscapeCharacter::HandleItemPickedUp);
+	gameInstance->GetMessenger()->OnAddInteractTarget.AddDynamic(this, &AHouseEscapeCharacter::AddInteractTarget);
+	gameInstance->GetMessenger()->OnRemoveInteract.AddDynamic(this, &AHouseEscapeCharacter::RemoveInteractTarget);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -72,27 +77,18 @@ void AHouseEscapeCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 
 void AHouseEscapeCharacter::OnInteract()
 {
-	FVector RayCastStart = FirstPersonCameraComponent->GetComponentLocation();
-	FRotator CameraRotation = FirstPersonCameraComponent->GetComponentRotation();
-	FVector RayCastEnd = RayCastStart + (CameraRotation.Vector() * InteractDistance);
-
-	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
-	RV_TraceParams.bTraceComplex = true;
-	RV_TraceParams.bReturnPhysicalMaterial = false;
-	
-	DrawDebugLine(GetWorld(), RayCastStart, RayCastEnd, FColor::Green, false, 1, 0, 1);
-
-	//Re-initialize hit info
-	FHitResult RV_Hit(ForceInit);
-
-	if (GetWorld()->LineTraceSingleByChannel(RV_Hit, RayCastStart, RayCastEnd, ECC_Pawn, RV_TraceParams))
+	if (currentTargets.Num() == 0)
 	{
-		if (RV_Hit.GetActor()->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
-		{
-			IInteractInterface::Execute_OnInteract(RV_Hit.GetActor());
-		}
+		return;
 	}
 
+	if (currentTargets.Num() == 1)
+	{
+		IInteractInterface::Execute_OnInteract(currentTargets[0]);
+		return;
+	}
+
+	IInteractInterface::Execute_OnInteract(AInteractable::FindMostDesirableTarget(currentTargets, this));
 }
 
 void AHouseEscapeCharacter::MoveForward(float Value)
@@ -128,4 +124,49 @@ void AHouseEscapeCharacter::LookUpAtRate(float Rate)
 void AHouseEscapeCharacter::HandleItemPickedUp(FMessage message)
 {
 	items.Add(message.itemInfo);
+}
+
+void AHouseEscapeCharacter::AddInteractTarget(FMessage message)
+{
+	currentTargets.Add(message.interact);
+	isOverlapping = true;
+	AInteractable* tempTarget = AInteractable::FindMostDesirableTarget(currentTargets, this);
+
+	if (mostDesirableTarget == nullptr)
+	{
+		mostDesirableTarget = tempTarget;
+		mostDesirableTarget->SetRenderDepth(true);
+	} 
+	else if (mostDesirableTarget != tempTarget)
+	{
+		mostDesirableTarget->SetRenderDepth(false);
+		mostDesirableTarget = tempTarget;
+		mostDesirableTarget->SetRenderDepth(true);
+	}
+}
+
+void AHouseEscapeCharacter::RemoveInteractTarget(FMessage message)
+{
+	currentTargets.Remove(message.interact);
+	mostDesirableTarget->SetRenderDepth(false);
+	if (currentTargets.Num() == 0)
+	{
+		isOverlapping = false;
+		mostDesirableTarget = nullptr;
+	}
+	else
+	{
+		mostDesirableTarget = AInteractable::FindMostDesirableTarget(currentTargets, this);
+		mostDesirableTarget->SetRenderDepth(true);
+	}
+}
+
+bool AHouseEscapeCharacter::AnyCurrentTargets()
+{
+	return currentTargets.Num() > 0;
+}
+
+TArray<AInteractable*> AHouseEscapeCharacter::GetCurrentTargets()
+{
+	return currentTargets;
 }

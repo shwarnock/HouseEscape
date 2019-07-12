@@ -5,6 +5,7 @@
 APuzzle::APuzzle()
 {
 	isSolved = false;
+	interactType = Interacts::Puzzle;
 }
 
 void APuzzle::HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -12,10 +13,11 @@ void APuzzle::HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* Ot
 	if(IsPlayerOverlapping() && !isSolved)
 	{
 		FMessage message;
-		message.interactableType = Interacts::Puzzle;
-		message.uniqueId = uniqueId;
+		message.interact = this;
+		message.interactableType = interactType;
+		message.uniqueId =  uniqueId;
 		messenger->CollideWithInteractable(message);
-		StaticMeshComponent->SetRenderCustomDepth(true);
+		messenger->AddInteractTarget(message);
 	}
 }
 
@@ -24,9 +26,10 @@ void APuzzle::HandleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* Othe
 	if (!IsPlayerOverlapping())
 	{
 		FMessage message;
-		message.interactableType = Interacts::Puzzle;
+		message.interact = this;
+		message.interactableType = interactType;
 		messenger->EndCollideWithInteractable(message);
-		StaticMeshComponent->SetRenderCustomDepth(false);
+		messenger->RemoveInteractTarget(message);
 	}
 }
 

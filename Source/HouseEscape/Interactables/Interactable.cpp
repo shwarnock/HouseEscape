@@ -2,6 +2,8 @@
 
 #include "Interactable.h"
 #include "HouseEscapeGameInstance.h"
+#include "Engine.h"
+#include "HouseEscapeCharacter.h"
 #include "Components/StaticMeshComponent.h"
 
 // Sets default values
@@ -19,7 +21,7 @@ AInteractable::AInteractable()
 	BoxComponent->SetupAttachment(RootComponent);
 	BoxComponent->SetRelativeLocation(FVector::ZeroVector);
 
-	uniqueID = FGuid::NewGuid();
+	uniqueId = FGuid::NewGuid();
 }
 
 // Called when the game starts or when spawned
@@ -45,10 +47,30 @@ void AInteractable::Tick(float DeltaTime)
 
 void AInteractable::HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (!IsPlayerOverlapping())
+	{
+		return;
+	}
+
+	FMessage message;
+	message.interact = this;
+	message.interactableType = interactType;
+	messenger->CollideWithInteractable(message);
+	messenger->AddInteractTarget(message);
 }
 
 void AInteractable::HandleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	if (IsPlayerOverlapping())
+	{
+		return;
+	}
+
+	FMessage message;
+	message.interact = this;
+	message.interactableType = interactType;
+	messenger->EndCollideWithInteractable(message);
+	messenger->RemoveInteractTarget(message);
 }
 
 void AInteractable::OnInteract_Implementation() 
@@ -58,4 +80,38 @@ void AInteractable::OnInteract_Implementation()
 bool AInteractable::IsPlayerOverlapping()
 {
 	return BoxComponent->IsOverlappingActor(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+}
+
+AInteractable* AInteractable::FindMostDesirableTarget(TArray<AInteractable*> interactables, AHouseEscapeCharacter* player)
+{
+	if (interactables.Num() == 1)
+	{
+		return interactables[0];
+	}
+
+	FVector playerForward = player->GetActorForwardVector();
+	playerForward.GetSafeNormal();
+	FVector playerLocation = player->GetActorLocation();
+
+	AInteractable* mostDesirable = nullptr;
+	FVector firstVec = (interactables[0]->GetActorLocation() - playerLocation).GetSafeNormal();
+	float firstVecDot = FVector::DotProduct(playerForward, interactables[0]->GetActorLocation());
+
+	int count = interactables.Num();
+	for (int i = 1; i < count; ++i)
+	{
+		FVector secVec = (interactables[i]->GetActorLocation() - playerLocation).GetSafeNormal();
+		float secVecDot = FVector::DotProduct(playerForward, secVec);
+
+		mostDesirable = firstVecDot <= secVecDot ? interactables[i - 1] : interactables[i];
+		firstVec = secVec;
+		firstVecDot = secVecDot;
+	}
+
+	return mostDesirable;
+}
+
+void AInteractable::SetRenderDepth(bool renderSet)
+{
+	StaticMeshComponent->SetRenderCustomDepth(renderSet);
 }

@@ -29,3 +29,13 @@ void UMessenger::ItemPickedUp(FMessage message)
 {
 	OnItemPickedUp.Broadcast(message);
 }
+
+void UMessenger::AddInteractTarget(FMessage message)
+{
+	OnAddInteractTarget.Broadcast(message);
+}
+
+void UMessenger::RemoveInteractTarget(FMessage message)
+{
+	OnRemoveInteract.Broadcast(message);
+}
