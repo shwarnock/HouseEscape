@@ -55,4 +55,7 @@ private:
 
 	UFUNCTION()
 	void HandleKeyPickedUp(FMessage message);
+
+public:
+	TEnumAsByte<DoorStates> GetDoorState();
 };

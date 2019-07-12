@@ -7,6 +7,8 @@
 #include "GameFramework/InputSettings.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "HouseEscapeGameInstance.h"
+#include "Enums.h"
+#include "Door.h"
 #include "Kismet/GameplayStatics.h"
 #include "InteractInterface.h"
 
@@ -49,10 +51,10 @@ void AHouseEscapeCharacter::BeginPlay()
 
 	StaticMesh->SetHiddenInGame(false, true);
 
-	UHouseEscapeGameInstance* gameInstance = Cast<UHouseEscapeGameInstance>(GetWorld()->GetGameInstance());
-	gameInstance->GetMessenger()->OnItemPickedUp.AddDynamic(this, &AHouseEscapeCharacter::HandleItemPickedUp);
-	gameInstance->GetMessenger()->OnAddInteractTarget.AddDynamic(this, &AHouseEscapeCharacter::AddInteractTarget);
-	gameInstance->GetMessenger()->OnRemoveInteract.AddDynamic(this, &AHouseEscapeCharacter::RemoveInteractTarget);
+	messenger = Cast<UHouseEscapeGameInstance>(GetWorld()->GetGameInstance())->GetMessenger();
+	messenger->OnItemPickedUp.AddDynamic(this, &AHouseEscapeCharacter::HandleItemPickedUp);
+	messenger->OnAddInteractTarget.AddDynamic(this, &AHouseEscapeCharacter::AddInteractTarget);
+	messenger->OnRemoveInteract.AddDynamic(this, &AHouseEscapeCharacter::RemoveInteractTarget);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -136,12 +138,14 @@ void AHouseEscapeCharacter::AddInteractTarget(FMessage message)
 	{
 		mostDesirableTarget = tempTarget;
 		mostDesirableTarget->SetRenderDepth(true);
+		messenger->CollideWithInteractable(message);
 	} 
 	else if (mostDesirableTarget != tempTarget)
 	{
 		mostDesirableTarget->SetRenderDepth(false);
 		mostDesirableTarget = tempTarget;
-		mostDesirableTarget->SetRenderDepth(true);
+		mostDesirableTarget->SetRenderDepth(true); 
+		messenger->CollideWithInteractable(message);
 	}
 }
 
@@ -153,11 +157,13 @@ void AHouseEscapeCharacter::RemoveInteractTarget(FMessage message)
 	{
 		isOverlapping = false;
 		mostDesirableTarget = nullptr;
+		messenger->EndCollideWithInteractable(message);
 	}
 	else
 	{
 		mostDesirableTarget = AInteractable::FindMostDesirableTarget(currentTargets, this);
 		mostDesirableTarget->SetRenderDepth(true);
+		messenger->CollideWithInteractable(message);
 	}
 }
 
@@ -169,4 +175,26 @@ bool AHouseEscapeCharacter::AnyCurrentTargets()
 TArray<AInteractable*> AHouseEscapeCharacter::GetCurrentTargets()
 {
 	return currentTargets;
+}
+
+void AHouseEscapeCharacter::Tick(float DeltaSeconds)
+{
+	if (FirstPersonCameraComponent->GetForwardVector() != CameraForward && AnyCurrentTargets())
+	{
+		AInteractable* tempMostDesirable = AInteractable::FindMostDesirableTarget(currentTargets, this);
+		if (mostDesirableTarget != tempMostDesirable)
+		{
+			CameraForward = FirstPersonCameraComponent->GetForwardVector();
+			mostDesirableTarget->SetRenderDepth(false);
+			mostDesirableTarget = tempMostDesirable;
+			mostDesirableTarget->SetRenderDepth(true);
+			FMessage message;
+			message.interactableType = mostDesirableTarget->GetInteractType();
+			if (Cast<ADoor>(mostDesirableTarget))
+			{
+				message.doorState = Cast<ADoor>(mostDesirableTarget)->GetDoorState();
+			}
+			messenger->CollideWithInteractable(message);
+		}
+	}
 }

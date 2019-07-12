@@ -56,6 +56,8 @@ public:
 
 	void SetRenderDepth(bool setRender);
 
+	TEnumAsByte<Interacts> GetInteractType();
+
 protected:
 
 	UFUNCTION()

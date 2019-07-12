@@ -39,3 +39,8 @@ void UMessenger::RemoveInteractTarget(FMessage message)
 {
 	OnRemoveInteract.Broadcast(message);
 }
+
+void UMessenger::UpdateInteractUI(FMessage message)
+{
+	OnUpdateInteractUI.Broadcast(message);
+}

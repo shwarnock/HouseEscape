@@ -55,7 +55,6 @@ void AInteractable::HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AAct
 	FMessage message;
 	message.interact = this;
 	message.interactableType = interactType;
-	messenger->CollideWithInteractable(message);
 	messenger->AddInteractTarget(message);
 }
 
@@ -69,7 +68,6 @@ void AInteractable::HandleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor
 	FMessage message;
 	message.interact = this;
 	message.interactableType = interactType;
-	messenger->EndCollideWithInteractable(message);
 	messenger->RemoveInteractTarget(message);
 }
 
@@ -90,20 +88,22 @@ AInteractable* AInteractable::FindMostDesirableTarget(TArray<AInteractable*> int
 	}
 
 	FVector playerForward = player->GetActorForwardVector();
-	playerForward.GetSafeNormal();
+	playerForward.Normalize();
 	FVector playerLocation = player->GetActorLocation();
 
 	AInteractable* mostDesirable = nullptr;
-	FVector firstVec = (interactables[0]->GetActorLocation() - playerLocation).GetSafeNormal();
+	FVector firstVec = (interactables[0]->GetActorLocation() - playerLocation);
+	firstVec.Normalize();
 	float firstVecDot = FVector::DotProduct(playerForward, interactables[0]->GetActorLocation());
 
 	int count = interactables.Num();
 	for (int i = 1; i < count; ++i)
 	{
-		FVector secVec = (interactables[i]->GetActorLocation() - playerLocation).GetSafeNormal();
+		FVector secVec = (interactables[i]->GetActorLocation() - playerLocation);
+		secVec.Normalize();
 		float secVecDot = FVector::DotProduct(playerForward, secVec);
 
-		mostDesirable = firstVecDot <= secVecDot ? interactables[i - 1] : interactables[i];
+		mostDesirable = firstVecDot >= secVecDot ? interactables[i - 1] : interactables[i];
 		firstVec = secVec;
 		firstVecDot = secVecDot;
 	}
@@ -114,4 +114,9 @@ AInteractable* AInteractable::FindMostDesirableTarget(TArray<AInteractable*> int
 void AInteractable::SetRenderDepth(bool renderSet)
 {
 	StaticMeshComponent->SetRenderCustomDepth(renderSet);
+}
+
+TEnumAsByte<Interacts> AInteractable::GetInteractType()
+{
+	return interactType;
 }

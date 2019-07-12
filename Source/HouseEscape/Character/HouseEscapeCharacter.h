@@ -7,6 +7,7 @@
 #include "MessageStruct.h"
 #include "ItemStruct.h"
 #include "Interactable.h"
+#include "Messenger.h"
 #include "HouseEscapeCharacter.generated.h"
 
 class UInputComponent;
@@ -90,5 +91,11 @@ private:
 
 	UFUNCTION()
 	void RemoveInteractTarget(FMessage message);
+
+	FVector CameraForward;
+
+	void Tick(float DeltaSeconds) override;
+
+	UMessenger* messenger;
 };
 

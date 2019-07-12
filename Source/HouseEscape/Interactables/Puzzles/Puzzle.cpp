@@ -16,7 +16,6 @@ void APuzzle::HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* Ot
 		message.interact = this;
 		message.interactableType = interactType;
 		message.uniqueId =  uniqueId;
-		messenger->CollideWithInteractable(message);
 		messenger->AddInteractTarget(message);
 	}
 }
@@ -28,7 +27,6 @@ void APuzzle::HandleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* Othe
 		FMessage message;
 		message.interact = this;
 		message.interactableType = interactType;
-		messenger->EndCollideWithInteractable(message);
 		messenger->RemoveInteractTarget(message);
 	}
 }

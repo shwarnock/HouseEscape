@@ -14,6 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FKeyPickedUpDelegate, FMessage, mess
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemPickedUpDelegate, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddInteractDelegate, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemoveInteractDelegate, FMessage, message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateInteractUIDelegate, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRemoveAllWidgetsDelegate);
 
 UCLASS(BlueprintType)
@@ -46,6 +47,9 @@ public:
 	UPROPERTY()
 	FRemoveInteractDelegate OnRemoveInteract;
 
+	UPROPERTY(BlueprintAssignable)
+	FUpdateInteractUIDelegate OnUpdateInteractUI;
+
 public:
 	void CollideWithInteractable(FMessage message);
 	void EndCollideWithInteractable(FMessage message);
@@ -59,4 +63,6 @@ public:
 
 	void AddInteractTarget(FMessage message);
 	void RemoveInteractTarget(FMessage message);
+
+	void UpdateInteractUI(FMessage message);
 };

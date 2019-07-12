@@ -11,7 +11,6 @@ void ADoor::HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* Othe
 		message.room = neededKey;
 		message.interact = this;
 		message.doorState = doorState;
-		messenger->CollideWithInteractable(message);
 		messenger->AddInteractTarget(message);
 	}
 }
@@ -23,7 +22,6 @@ void ADoor::HandleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 		FMessage message;
 		message.interact = this;
 		message.interactableType = interactType;
-		messenger->EndCollideWithInteractable(message);
 		messenger->RemoveInteractTarget(message);
 	}
 }
@@ -141,4 +139,9 @@ void ADoor::HandleKeyPickedUp(FMessage message)
 	{
 		doorState = DoorStates::Closed;
 	}
+}
+
+TEnumAsByte<DoorStates> ADoor::GetDoorState()
+{
+	return doorState;
 }
