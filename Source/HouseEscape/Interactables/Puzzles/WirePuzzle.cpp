@@ -62,56 +62,9 @@ AWirePuzzle::AWirePuzzle()
 	puzzleType = Puzzles::WirePuzzle;
 }
 
-void AWirePuzzle::OnInteract_Implementation()
-{
-	//If we are not currently overlapping the box component, do not interact
-	if (!AInteractable::BoxComponent->IsOverlappingComponent(UGameplayStatics::GetPlayerCharacter(AInteractable::GetWorld(), 0)->GetCapsuleComponent()))
-	{
-		return;
-	}
-
-	messenger->RemoveAllWidgets();
-	APlayerController* playerController = AInteractable::GetWorld()->GetFirstPlayerController();
-
-	//Toggle between player controller's camera and this camera when interact button is pressed
-	if (playerController->GetViewTarget() == this)
-	{
-		playerController->SetViewTargetWithBlend((AActor*)UGameplayStatics::GetPlayerCharacter(AInteractable::GetWorld(), 0), 0.5f);
-		playerController->bEnableMouseOverEvents = false;
-		playerController->bShowMouseCursor = false;
-		playerController->bEnableClickEvents = false;
-		AInteractable::StaticMeshComponent->SetRenderCustomDepth(true);
-
-		playerController->SetInputMode(FInputModeGameOnly());
-	}
-	else
-	{
-		playerController->SetViewTargetWithBlend((AActor*) this, 0.5f);
-		playerController->bEnableMouseOverEvents = true;
-		playerController->bShowMouseCursor = true;
-		playerController->bEnableClickEvents = true;
-		AInteractable::StaticMeshComponent->SetRenderCustomDepth(false);
-
-		playerController->SetInputMode(FInputModeGameAndUI());
-	}
-	
-}
-
 void AWirePuzzle::BeginPlay()
 {
 	Super::BeginPlay();
-
-	isSolved = saveGameUtil->GetPuzzleState(puzzleType);
-	if (isSolved)
-	{
-		InitPuzzleState();
-		if (!saveGameUtil->DoesPlayerHaveKey(roomPuzzleUnlocks))
-		{
-			FMessage message;
-			message.room = roomPuzzleUnlocks;
-			messenger->PuzzleSolved(message);
-		}
-	}
 }
 
 void AWirePuzzle::HandleComponentClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed)
@@ -156,6 +109,7 @@ void AWirePuzzle::CheckSolution()
 
 void AWirePuzzle::InitPuzzleState()
 {
+	Super::InitPuzzleState();
 
 	TArray<UWirePuzzleMeshComponent*> components;
 	AInteractable::GetComponents<UWirePuzzleMeshComponent>(components);

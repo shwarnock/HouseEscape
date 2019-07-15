@@ -15,6 +15,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemPickedUpDelegate, FMessage, mes
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddInteractDelegate, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemoveInteractDelegate, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateInteractUIDelegate, FMessage, message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FToggleInventoryDelegate, FMessage, message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageInventoryItemSelected, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRemoveAllWidgetsDelegate);
 
 UCLASS(BlueprintType)
@@ -50,6 +52,12 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FUpdateInteractUIDelegate OnUpdateInteractUI;
 
+	UPROPERTY(BlueprintAssignable)
+	FToggleInventoryDelegate OnToggleInventory;
+
+	UPROPERTY()
+	FMessageInventoryItemSelected OnInventoryItemSelected;
+
 public:
 	void CollideWithInteractable(FMessage message);
 	void EndCollideWithInteractable(FMessage message);
@@ -61,8 +69,16 @@ public:
 
 	void ItemPickedUp(FMessage message);
 
+	UFUNCTION(BlueprintCallable)
 	void AddInteractTarget(FMessage message);
+
+	UFUNCTION(BlueprintCallable)
 	void RemoveInteractTarget(FMessage message);
 
 	void UpdateInteractUI(FMessage message);
+
+	void ToggleInventory(FMessage message);
+
+	UFUNCTION(BlueprintCallable)
+	void InventoryItemSelected(FMessage message);
 };

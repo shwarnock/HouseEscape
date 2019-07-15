@@ -45,6 +45,8 @@ public:
 
 	TArray<AInteractable*> GetCurrentTargets();
 
+	FItem GetLastSelectedItem();
+
 protected:
 	virtual void BeginPlay();
 
@@ -72,6 +74,9 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	// End of APawn interface
 
+	UPROPERTY(BlueprintReadOnly)
+		AInteractable* mostDesirableTarget;
+
 private:
 	const float InteractDistance = 300.0f;
 
@@ -84,7 +89,7 @@ private:
 
 	TArray<AInteractable*> currentTargets;
 
-	AInteractable* mostDesirableTarget;
+
 
 	UFUNCTION()
 	void AddInteractTarget(FMessage message);
@@ -97,5 +102,13 @@ private:
 	void Tick(float DeltaSeconds) override;
 
 	UMessenger* messenger;
+
+	void OnInventory();
+	bool IsInventoryOpen;
+
+	FItem lastItemSelected;
+
+	UFUNCTION()
+	void SetLastItemSelected(FMessage message);
 };
 

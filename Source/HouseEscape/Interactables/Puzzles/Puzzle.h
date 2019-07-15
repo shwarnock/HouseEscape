@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Interactable.h"
+#include "Camera/CameraComponent.h"
 #include "Key.h"
 #include "Puzzle.generated.h"
 
@@ -35,9 +36,16 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte<Puzzles> puzzleType;
 
+	UPROPERTY()
+	UCameraComponent* CameraComponent;
+
 	virtual void CheckSolution();
 
 	bool isSolved;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "MyCategory")
+	void OnInteract();
+	void OnInteract_Implementation() override;
 
 	virtual void InitPuzzleState();
 };

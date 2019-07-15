@@ -22,6 +22,8 @@ AInteractable::AInteractable()
 	BoxComponent->SetRelativeLocation(FVector::ZeroVector);
 
 	uniqueId = FGuid::NewGuid();
+
+	IsValidInteract = true;
 }
 
 // Called when the game starts or when spawned
@@ -75,6 +77,10 @@ void AInteractable::OnInteract_Implementation()
 {
 }
 
+void AInteractable::OnUseItem_Implementation(FMessage message)
+{
+}
+
 bool AInteractable::IsPlayerOverlapping()
 {
 	return BoxComponent->IsOverlappingActor(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
@@ -113,7 +119,7 @@ AInteractable* AInteractable::FindMostDesirableTarget(TArray<AInteractable*> int
 
 void AInteractable::SetRenderDepth(bool renderSet)
 {
-	StaticMeshComponent->SetRenderCustomDepth(renderSet);
+	Cast<UStaticMeshComponent>(RootComponent)->SetRenderCustomDepth(renderSet);
 }
 
 TEnumAsByte<Interacts> AInteractable::GetInteractType()

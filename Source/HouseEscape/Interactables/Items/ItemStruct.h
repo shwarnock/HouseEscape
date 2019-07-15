@@ -18,21 +18,18 @@ struct FItem
 
 public:
 
-	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* meshComponent;
-
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TEnumAsByte<ItemType> itemType;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UTexture2D* texture;
 
-	UPROPERTY(EditAnywhere)
-	FName name;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText name;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int itemIndex;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	AItemBase* baseClass;
 };

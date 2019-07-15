@@ -21,6 +21,15 @@ class HOUSEESCAPE_API ALightSwitch : public AInteractable
 	UPROPERTY(EditAnywhere)
 	APointLight* pointLight2;
 
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* SwitchFlip;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* TopScrew;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* BottomScrew;
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "MyCategory")
 	void OnInteract();

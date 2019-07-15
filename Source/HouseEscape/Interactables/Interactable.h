@@ -44,7 +44,9 @@ protected:
 	USaveGameUtil* saveGameUtil;
 
 	virtual void OnInteract_Implementation() override;
+	virtual void OnUseItem_Implementation(FMessage message) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TEnumAsByte<Interacts> interactType;
 
 public:	
@@ -58,6 +60,8 @@ public:
 
 	TEnumAsByte<Interacts> GetInteractType();
 
+	bool GetIsValidInteract();
+
 protected:
 
 	UFUNCTION()
@@ -69,4 +73,6 @@ protected:
 	bool IsPlayerOverlapping();
 
 	FGuid uniqueId;
+
+	bool IsValidInteract;
 };

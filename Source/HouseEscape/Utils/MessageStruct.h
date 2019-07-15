@@ -25,7 +25,7 @@ public:
 	UPROPERTY()
 	TEnumAsByte<Puzzles> puzzleType;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	FItem itemInfo;
 
 	UPROPERTY()
@@ -33,4 +33,7 @@ public:
 
 	UPROPERTY()
 	AInteractable* interact;
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FItem> items;
 };

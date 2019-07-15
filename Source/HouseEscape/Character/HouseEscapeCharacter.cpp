@@ -42,6 +42,10 @@ AHouseEscapeCharacter::AHouseEscapeCharacter()
 
 	isOverlapping = false;
 	mostDesirableTarget = nullptr;
+
+	IsInventoryOpen = false;
+
+	lastItemSelected;
 }
 
 void AHouseEscapeCharacter::BeginPlay()
@@ -55,6 +59,7 @@ void AHouseEscapeCharacter::BeginPlay()
 	messenger->OnItemPickedUp.AddDynamic(this, &AHouseEscapeCharacter::HandleItemPickedUp);
 	messenger->OnAddInteractTarget.AddDynamic(this, &AHouseEscapeCharacter::AddInteractTarget);
 	messenger->OnRemoveInteract.AddDynamic(this, &AHouseEscapeCharacter::RemoveInteractTarget);
+	messenger->OnInventoryItemSelected.AddDynamic(this, &AHouseEscapeCharacter::SetLastItemSelected);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -67,6 +72,7 @@ void AHouseEscapeCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AHouseEscapeCharacter::OnInteract);
+	PlayerInputComponent->BindAction("Inventory", IE_Pressed, this, &AHouseEscapeCharacter::OnInventory);
 
 	// Bind movement events
 	PlayerInputComponent->BindAxis("MoveForward", this, &AHouseEscapeCharacter::MoveForward);
@@ -133,6 +139,11 @@ void AHouseEscapeCharacter::AddInteractTarget(FMessage message)
 	currentTargets.Add(message.interact);
 	isOverlapping = true;
 	AInteractable* tempTarget = AInteractable::FindMostDesirableTarget(currentTargets, this);
+	
+	if (!tempTarget)
+	{
+		return;
+	}
 
 	if (mostDesirableTarget == nullptr)
 	{
@@ -162,6 +173,10 @@ void AHouseEscapeCharacter::RemoveInteractTarget(FMessage message)
 	else
 	{
 		mostDesirableTarget = AInteractable::FindMostDesirableTarget(currentTargets, this);
+		if (!mostDesirableTarget)
+		{
+			return;
+		}
 		mostDesirableTarget->SetRenderDepth(true);
 		messenger->CollideWithInteractable(message);
 	}
@@ -182,6 +197,10 @@ void AHouseEscapeCharacter::Tick(float DeltaSeconds)
 	if (FirstPersonCameraComponent->GetForwardVector() != CameraForward && AnyCurrentTargets())
 	{
 		AInteractable* tempMostDesirable = AInteractable::FindMostDesirableTarget(currentTargets, this);
+		if (!tempMostDesirable)
+		{
+			return;
+		}
 		if (mostDesirableTarget != tempMostDesirable)
 		{
 			CameraForward = FirstPersonCameraComponent->GetForwardVector();
@@ -197,4 +216,38 @@ void AHouseEscapeCharacter::Tick(float DeltaSeconds)
 			messenger->CollideWithInteractable(message);
 		}
 	}
+}
+
+void AHouseEscapeCharacter::OnInventory()
+{
+	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (IsInventoryOpen)
+	{
+		playerController->bEnableMouseOverEvents = false;
+		playerController->bShowMouseCursor = false;
+		playerController->bEnableClickEvents = false;
+		playerController->SetInputMode(FInputModeGameOnly());
+	}
+	else
+	{
+		playerController->bEnableMouseOverEvents = true;
+		playerController->bShowMouseCursor = true;
+		playerController->bEnableClickEvents = true;
+		playerController->SetInputMode(FInputModeGameAndUI());
+	}
+
+	FMessage message;
+	message.items = items;
+	messenger->ToggleInventory(message);
+	IsInventoryOpen = !IsInventoryOpen;
+}
+
+void AHouseEscapeCharacter::SetLastItemSelected(FMessage message)
+{
+	lastItemSelected = message.itemInfo;
+}
+
+FItem AHouseEscapeCharacter::GetLastSelectedItem()
+{
+	return lastItemSelected;
 }

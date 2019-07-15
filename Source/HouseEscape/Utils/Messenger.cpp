@@ -44,3 +44,13 @@ void UMessenger::UpdateInteractUI(FMessage message)
 {
 	OnUpdateInteractUI.Broadcast(message);
 }
+
+void UMessenger::ToggleInventory(FMessage message)
+{
+	OnToggleInventory.Broadcast(message);
+}
+
+void UMessenger::InventoryItemSelected(FMessage message)
+{
+	OnInventoryItemSelected.Broadcast(message);
+}

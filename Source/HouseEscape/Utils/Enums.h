@@ -16,7 +16,8 @@ enum Interacts
 	Key,
 	Puzzle,
 	LightSwitch,
-	Item
+	Item,
+	Generic
 };
 
 UENUM(BlueprintType)
@@ -31,5 +32,6 @@ UENUM(BlueprintType)
 enum Puzzles
 {
 	WirePuzzle = 0,
-	None = 1
+	VentPuzzle = 1,
+	None = 2
 };

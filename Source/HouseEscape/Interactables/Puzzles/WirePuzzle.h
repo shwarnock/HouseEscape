@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Puzzle.h"
-#include "Camera/CameraComponent.h"
 #include "InputCoreTypes.h"
 #include "WirePuzzleMeshComponent.h"
 #include "WirePuzzle.generated.h"
@@ -38,9 +37,6 @@ class HOUSEESCAPE_API AWirePuzzle : public APuzzle
 	UPROPERTY()
 	UWirePuzzleMeshComponent* GreenB;
 
-	UPROPERTY()
-	UCameraComponent* CameraComponent;
-
 public:
 	AWirePuzzle();
 
@@ -71,10 +67,6 @@ protected:
 
 	UFUNCTION()
 	void HandleComponentClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "MyCategory")
-	void OnInteract();
-	void OnInteract_Implementation() override;
 
 	UFUNCTION()
 	void InitPuzzleState() override;
