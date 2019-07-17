@@ -23,6 +23,8 @@ private:
 
 	UMessenger* messenger;
 
+	void InitDoorStates();
+
 public:
 	void CreateSaveGame();
 	void Init(UMessenger* messengerRef);

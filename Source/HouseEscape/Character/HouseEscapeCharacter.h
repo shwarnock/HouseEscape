@@ -89,8 +89,6 @@ private:
 
 	TArray<AInteractable*> currentTargets;
 
-
-
 	UFUNCTION()
 	void AddInteractTarget(FMessage message);
 

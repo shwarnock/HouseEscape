@@ -67,14 +67,15 @@ ADoor::ADoor()
 	BoxComponent->SetRelativeLocation(FVector(0, 0, 100));
 	BoxComponent->SetRelativeScale3D(FVector(1.5f, 1.75f, 3.0f));
 
-	static ConstructorHelpers::FObjectFinder<UCurveFloat> Curve(TEXT("/Game/DoorCurve.DoorCurve"));
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> Curve(TEXT("/Game/Curve.Curve"));
 	check(Curve.Succeeded());
 
 	FloatCurve = Curve.Object;
 
 	doorState = DoorStates::NoKey;
-
 	interactType = Interacts::Door;
+
+	meshToRender = DoorComponent;
 }
 
 void ADoor::BeginPlay()
@@ -110,6 +111,11 @@ void ADoor::BeginPlay()
 	}
 
 	messenger->OnKeyPickedUp.AddDynamic(this, &ADoor::HandleKeyPickedUp);
+
+	if (saveGameUtil->DoesPlayerHaveKey(neededKey))
+	{
+		doorState = DoorStates::Closed;
+	}
 }
 
 void ADoor::Tick(float DeltaSeconds)

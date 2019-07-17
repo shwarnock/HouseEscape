@@ -27,6 +27,20 @@ protected:
 	void OnInteract();
 	void OnInteract_Implementation() override;
 
+	void BeginPlay() override;
+
+	void Tick(float DeltaSeconds) override;
+
+	UPROPERTY(BlueprintReadOnly)
+	TEnumAsByte<DoorStates> doorState;
+
+private:
+	UPROPERTY(EditAnywhere)
+	TEnumAsByte<Rooms> neededKey;
+
+	UFUNCTION()
+	void HandleKeyPickedUp(FMessage message);
+
 	UPROPERTY()
 	UTimelineComponent* MyTimeline;
 
@@ -41,20 +55,6 @@ protected:
 
 	UPROPERTY()
 	TEnumAsByte<ETimelineDirection::Type> TimelineDirection;
-
-	void BeginPlay() override;
-
-	void Tick(float DeltaSeconds) override;
-
-	UPROPERTY(BlueprintReadOnly)
-	TEnumAsByte<DoorStates> doorState;
-
-private:
-	UPROPERTY(EditAnywhere)
-	TEnumAsByte<Rooms> neededKey;
-
-	UFUNCTION()
-	void HandleKeyPickedUp(FMessage message);
 
 public:
 	TEnumAsByte<DoorStates> GetDoorState();

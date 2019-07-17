@@ -60,8 +60,6 @@ public:
 
 	TEnumAsByte<Interacts> GetInteractType();
 
-	bool GetIsValidInteract();
-
 protected:
 
 	UFUNCTION()
@@ -71,6 +69,8 @@ protected:
 	virtual void HandleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	bool IsPlayerOverlapping();
+
+	UStaticMeshComponent* meshToRender;
 
 	FGuid uniqueId;
 

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Enums.h"
 #include "ItemStruct.h"
+#include "Components/StaticMeshComponent.h"
 #include "MessageStruct.generated.h"
 
 class AInteractable;
