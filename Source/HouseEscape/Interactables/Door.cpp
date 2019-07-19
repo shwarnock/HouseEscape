@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Door.h"
+#include "Engine.h"
 
 void ADoor::HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -36,15 +37,16 @@ void ADoor::OnInteract_Implementation()
 
 	if (saveGameUtil->DoesPlayerHaveKey(neededKey) && MyTimeline != NULL)
 	{
+		DoorComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		switch (doorState)
 		{
 			case DoorStates::Open:
-				MyTimeline->ReverseFromEnd();
 				doorState = DoorStates::Closed;
+				MyTimeline->ReverseFromEnd();
 				break;
 			case DoorStates::Closed:
-				MyTimeline->PlayFromStart();
 				doorState = DoorStates::Open;
+				MyTimeline->PlayFromStart();
 				break;
 		}
 
@@ -59,6 +61,8 @@ ADoor::ADoor()
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> Frame(TEXT("/Game/StarterContent/Props/SM_DoorFrame.SM_DoorFrame"));
 
 	StaticMeshComponent->SetStaticMesh(Frame.Object);
+	StaticMeshComponent->SetRelativeScale3D(FVector(1, 1.05, 1.05));
+
 	DoorComponent->SetStaticMesh(Door.Object);
 
 	DoorComponent->SetupAttachment(RootComponent);
@@ -76,6 +80,8 @@ ADoor::ADoor()
 	interactType = Interacts::Door;
 
 	meshToRender = DoorComponent;
+
+	TimerDel.BindUFunction(this, FName{ TEXT("CloseDoor") });
 }
 
 void ADoor::BeginPlay()
@@ -136,7 +142,18 @@ void ADoor::TimelineCallback(float interpolatedVal)
 
 void ADoor::TimelineFinishedCallback()
 {
-	// This function is called when the timeline finishes playing.
+	if (doorState == DoorStates::Open)
+	{
+		GetWorldTimerManager().SetTimer(UnusedHandle, TimerDel, 1.0f, false);
+	}
+
+	DoorComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void ADoor::CloseDoor()
+{
+	doorState = DoorStates::Closed;
+	MyTimeline->ReverseFromEnd();
 }
 
 void ADoor::HandleKeyPickedUp(FMessage message)

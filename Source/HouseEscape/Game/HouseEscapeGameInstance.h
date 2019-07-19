@@ -6,6 +6,7 @@
 #include "Engine/GameInstance.h"
 #include "Messenger.h"
 #include "SaveGameUtil.h"
+#include "Timespan.h"
 #include "HouseEscapeGameInstance.generated.h"
 
 UCLASS()
@@ -29,4 +30,8 @@ private:
 
 	UPROPERTY()
 	USaveGameUtil* saveGame;
+
+	FDateTime StartTime;
+	
+	void Shutdown() override;
 };

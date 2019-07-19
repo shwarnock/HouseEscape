@@ -36,7 +36,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte<Puzzles> puzzleType;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCameraComponent* CameraComponent;
 
 	virtual void CheckSolution();
@@ -48,4 +48,6 @@ protected:
 	void OnInteract_Implementation() override;
 
 	virtual void InitPuzzleState();
+
+	virtual void PuzzleCompleted();
 };

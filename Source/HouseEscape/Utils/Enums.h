@@ -6,8 +6,9 @@
 UENUM(BlueprintType)
 enum Rooms
 {
-	BasementFrontCenterRoom,
-	BasementFrontRight
+	BasementFrontCenterRoom = 0,
+	BasementFrontRight = 1,
+	BasementBackLeftRoom = 2
 };
 
 UENUM(BlueprintType)

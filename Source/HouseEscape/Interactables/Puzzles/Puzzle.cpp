@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Puzzle.h"
+#include "HouseEscapeCharacter.h"
 
 APuzzle::APuzzle()
 {
@@ -76,6 +77,11 @@ void APuzzle::OnInteract_Implementation()
 		return;
 	}
 
+	if (isSolved)
+	{
+		return;
+	}
+
 	messenger->RemoveAllWidgets();
 	APlayerController* playerController = AInteractable::GetWorld()->GetFirstPlayerController();
 
@@ -104,4 +110,21 @@ void APuzzle::OnInteract_Implementation()
 
 		playerController->SetInputMode(FInputModeGameAndUI());
 	}
+}
+
+void APuzzle::PuzzleCompleted()
+{
+	FMessage message;
+	message.room = roomPuzzleUnlocks;
+	message.puzzleType = puzzleType;
+	message.interact = this;
+	messenger->PuzzleSolved(message);
+	isSolved = true;
+
+	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	playerController->SetViewTargetWithBlend((AActor*)UGameplayStatics::GetPlayerCharacter(AInteractable::GetWorld(), 0), 0.5f);
+	playerController->bEnableMouseOverEvents = false;
+	playerController->bShowMouseCursor = false;
+	playerController->bEnableClickEvents = false;
+	playerController->SetInputMode(FInputModeGameOnly());
 }

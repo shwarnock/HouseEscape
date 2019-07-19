@@ -31,4 +31,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "MyCategory")
 	void OnInteract();
 	virtual void OnInteract_Implementation() override;
+
+	UFUNCTION()
+	void HandleClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
 };

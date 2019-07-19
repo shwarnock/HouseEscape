@@ -20,9 +20,13 @@ protected:
 	void OnInteract();
 	void OnInteract_Implementation() override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FItem itemInfo;
+
+	void BeginPlay() override;
 
 public:
 	AItemBase();
+
+	static FItem EmptyItem();
 };

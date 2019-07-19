@@ -1,3 +1,4 @@
+
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Interactable.h"
@@ -100,30 +101,51 @@ bool AInteractable::IsPlayerOverlapping()
 
 AInteractable* AInteractable::FindMostDesirableTarget(TArray<AInteractable*> interactables, AHouseEscapeCharacter* player)
 {
-	if (interactables.Num() == 1)
-	{
-		return interactables[0];
-	}
-
 	FVector playerForward = player->GetActorForwardVector();
 	playerForward.Normalize();
 	FVector playerLocation = player->GetActorLocation();
 
+	if (interactables.Num() == 1)
+	{
+		FVector vec = (interactables[0]->GetActorLocation() - playerLocation);
+		vec.Normalize();
+		return FVector::DotProduct(playerForward, vec) > 0 ? interactables[0] : nullptr;
+	}
+
 	AInteractable* mostDesirable = nullptr;
-	FVector firstVec = (interactables[0]->GetActorLocation() - playerLocation);
-	firstVec.Normalize();
-	float firstVecDot = FVector::DotProduct(playerForward, interactables[0]->GetActorLocation());
+	FVector firstVec;
+	float firstDot = -9;
+	int loopCutOff = -1;
+	for (int i = 0; i < interactables.Num(); ++i)
+	{
+		firstVec = (interactables[i]->GetActorLocation() - playerLocation);
+		firstVec.Normalize();
+		firstDot = FVector::DotProduct(playerForward, firstVec);
+		if (firstDot > 0)
+		{
+			loopCutOff = i;
+			mostDesirable = interactables[i];
+			break;
+		}
+	}
+
+	if (loopCutOff == -1)
+	{
+		return nullptr;
+	}
 
 	int count = interactables.Num();
-	for (int i = 1; i < count; ++i)
+	for (int i = loopCutOff + 1; i < count; ++i)
 	{
 		FVector secVec = (interactables[i]->GetActorLocation() - playerLocation);
 		secVec.Normalize();
 		float secVecDot = FVector::DotProduct(playerForward, secVec);
 
-		mostDesirable = firstVecDot >= secVecDot ? interactables[i - 1] : interactables[i];
-		firstVec = secVec;
-		firstVecDot = secVecDot;
+		if (secVecDot > firstDot)
+		{
+			mostDesirable = interactables[i];
+			firstDot = secVecDot;
+		}
 	}
 
 	return mostDesirable;
@@ -131,7 +153,10 @@ AInteractable* AInteractable::FindMostDesirableTarget(TArray<AInteractable*> int
 
 void AInteractable::SetRenderDepth(bool renderSet)
 {
-	 meshToRender->SetRenderCustomDepth(renderSet);
+	if (this != nullptr && meshToRender->IsValidLowLevel())
+	{
+		meshToRender->SetRenderCustomDepth(renderSet);
+	}
 }
 
 TEnumAsByte<Interacts> AInteractable::GetInteractType()

@@ -16,7 +16,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddInteractDelegate, FMessage, mess
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemoveInteractDelegate, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateInteractUIDelegate, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FToggleInventoryDelegate, FMessage, message);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageInventoryItemSelected, FMessage, message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemSelected, FMessage, message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemRemovedDelegate, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRemoveAllWidgetsDelegate);
 
 UCLASS(BlueprintType)
@@ -56,13 +57,18 @@ public:
 	FToggleInventoryDelegate OnToggleInventory;
 
 	UPROPERTY()
-	FMessageInventoryItemSelected OnInventoryItemSelected;
+	FInventoryItemSelected OnInventoryItemSelected;
+
+	UPROPERTY()
+	FItemRemovedDelegate OnItemRemoved;
 
 public:
 	void CollideWithInteractable(FMessage message);
 	void EndCollideWithInteractable(FMessage message);
 
 	void PuzzleSolved(FMessage message);
+
+	UFUNCTION(BlueprintCallable)
 	void RemoveAllWidgets();
 
 	void KeyPickedUp(FMessage message);
@@ -81,4 +87,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void InventoryItemSelected(FMessage message);
+
+	void ItemRemoved(FMessage message);
 };

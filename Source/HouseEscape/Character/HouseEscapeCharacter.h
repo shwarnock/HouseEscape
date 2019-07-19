@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "MessageStruct.h"
 #include "ItemStruct.h"
+#include "SaveGameUtil.h"
 #include "Interactable.h"
 #include "Messenger.h"
 #include "HouseEscapeCharacter.generated.h"
@@ -17,15 +18,15 @@ class AHouseEscapeCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-	/** Pawn mesh: 1st person view (arms; seen only by self) */
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	class USkeletalMeshComponent* StaticMesh;
-
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FirstPersonCameraComponent;
 
 public:
+	/** Pawn mesh: 1st person view (arms; seen only by self) */
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	class USkeletalMeshComponent* StaticMesh;
+
 	AHouseEscapeCharacter();
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
@@ -80,11 +81,6 @@ protected:
 private:
 	const float InteractDistance = 300.0f;
 
-	UFUNCTION()
-	void HandleItemPickedUp(FMessage message);
-
-	TArray<FItem> items;
-
 	bool isOverlapping;
 
 	TArray<AInteractable*> currentTargets;
@@ -100,6 +96,7 @@ private:
 	void Tick(float DeltaSeconds) override;
 
 	UMessenger* messenger;
+	USaveGameUtil* saveGameUtil;
 
 	void OnInventory();
 	bool IsInventoryOpen;
@@ -108,5 +105,8 @@ private:
 
 	UFUNCTION()
 	void SetLastItemSelected(FMessage message);
+
+	UFUNCTION()
+	void ClearLastItemSelected(FMessage message);
 };
 

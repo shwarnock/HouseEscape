@@ -93,18 +93,12 @@ void AWirePuzzle::HandleComponentClicked(UPrimitiveComponent* TouchedComponent, 
 void AWirePuzzle::CheckSolution()
 {
 	int count = puzzleSolution.Num();
-	for (int i = 0; i < count; ++i)
+	if (currentPuzzleState != puzzleSolution)
 	{
-		if (currentPuzzleState[i] != puzzleSolution[i])
-		{
-			return;
-		}
+		return;
 	}
 
-	FMessage message;
-	message.room = roomPuzzleUnlocks;
-	message.puzzleType = puzzleType;
-	messenger->PuzzleSolved(message);
+	PuzzleCompleted();
 }
 
 void AWirePuzzle::InitPuzzleState()

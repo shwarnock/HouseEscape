@@ -8,6 +8,8 @@ UHouseEscapeGameInstance::UHouseEscapeGameInstance()
 {
 	messenger = NewObject<UMessenger>();
 	saveGame = NewObject<USaveGameUtil>();
+
+	StartTime = FDateTime::Now();
 }
 
 UMessenger* UHouseEscapeGameInstance::GetMessenger()
@@ -18,4 +20,17 @@ UMessenger* UHouseEscapeGameInstance::GetMessenger()
 USaveGameUtil* UHouseEscapeGameInstance::GetSaveGameUtil()
 {
 	return saveGame;
+}
+
+void UHouseEscapeGameInstance::Shutdown()
+{
+	if (saveGame->GetSaveGame() == nullptr)
+	{
+		return;
+	}
+
+	FDateTime currentTime = FDateTime::Now();
+	FTimespan duration = currentTime - StartTime;
+
+	saveGame->AddPlayTime(duration);
 }

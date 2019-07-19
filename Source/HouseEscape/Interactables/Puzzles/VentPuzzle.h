@@ -26,15 +26,36 @@ class HOUSEESCAPE_API AVentPuzzle : public APuzzle
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* BottomRightScrew;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* Grate;
+	
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* Top;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* Left;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* Right;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* Bottom;
 	
 public:
 	AVentPuzzle();
 
-private:
+protected:
 	UFUNCTION()
-	void HandleComponentClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
+	void HandleScrewComponentClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed);
+
+	void BeginPlay() override;
+
+private:
 
 	int screwCount;
 
 	void InitPuzzleState() override;
+
+	void CheckSolution() override;
 };

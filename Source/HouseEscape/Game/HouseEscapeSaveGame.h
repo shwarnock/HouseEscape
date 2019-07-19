@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Enums.h"
+#include "ItemStruct.h"
 #include "GameFramework/SaveGame.h"
 #include "HouseEscapeSaveGame.generated.h"
 
@@ -21,4 +22,10 @@ public:
 
 	UPROPERTY()
 	TMap<TEnumAsByte<Puzzles>, bool> puzzleStates;
+
+	UPROPERTY()
+	float TotalPlayTime;
+
+	UPROPERTY()
+	TArray<FItem> items;
 };

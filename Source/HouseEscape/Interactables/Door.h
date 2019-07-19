@@ -56,6 +56,12 @@ private:
 	UPROPERTY()
 	TEnumAsByte<ETimelineDirection::Type> TimelineDirection;
 
+	UFUNCTION()
+	void CloseDoor();
+
+	FTimerHandle UnusedHandle;
+	FTimerDelegate TimerDel;
+
 public:
 	TEnumAsByte<DoorStates> GetDoorState();
 };

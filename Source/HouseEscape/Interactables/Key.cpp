@@ -11,14 +11,21 @@ ADoorKey::ADoorKey()
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> KeyMesh(TEXT("/Game/StaticMeshes/Items/Key/key.key"));
 	StaticMeshComponent->SetStaticMesh(KeyMesh.Object);
+	StaticMeshComponent->OnClicked.AddDynamic(this, &ADoorKey::HandleClicked);
 
 	AInteractable::SetActorEnableCollision(false);
-	RootComponent->ToggleVisibility(false);
+	RootComponent->ToggleVisibility();
 	RootComponent->SetRelativeScale3D(FVector(0.15f, 0.15f, 0.15f));
 	
-	BoxComponent->SetRelativeScale3D(FVector(10.0f, 9.75f, 9.5f));
+	BoxComponent->SetBoxExtent(FVector(400, 400, 400));
+	BoxComponent->SetRelativeLocation(FVector(0, 0, 390));
 
 	interactType = Interacts::Key;
+}
+
+void ADoorKey::HandleClicked(UPrimitiveComponent* TouchedComponent, FKey ButtonPressed)
+{
+	OnInteract_Implementation();
 }
 
 // Called when the game starts or when spawned

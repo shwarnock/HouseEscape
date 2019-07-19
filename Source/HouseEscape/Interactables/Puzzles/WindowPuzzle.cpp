@@ -12,16 +12,17 @@ AWindowPuzzle::AWindowPuzzle()
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> BottomWindow(TEXT("/Game/StaticMeshes/Window/BottomWindowPane.BottomWindowPane"));
 
 	StaticMeshComponent->SetStaticMesh(MainWindow.Object);
+	StaticMeshComponent->SetRelativeLocation(FVector(400, 0, 0));
 
 	CenterWindowTop = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CenterWindowTop"));
 	CenterWindowTop->SetStaticMesh(MainWindow.Object);
 	CenterWindowTop->SetupAttachment(RootComponent);
-	CenterWindowTop->SetRelativeLocation(FVector(200, 0, 0));
+	CenterWindowTop->SetRelativeLocation(FVector(-200, 0, 0));
 
 	RightWindowTop = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RightWindowTop"));
 	RightWindowTop->SetStaticMesh(MainWindow.Object);
 	RightWindowTop->SetupAttachment(RootComponent);
-	RightWindowTop->SetRelativeLocation(FVector(400, 0, 0));
+	RightWindowTop->SetRelativeLocation(FVector(-400, 0, 0));
 
 	LeftWindowBottom = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LeftWindowBottom"));
 	LeftWindowBottom->SetStaticMesh(BottomWindow.Object);
@@ -52,6 +53,18 @@ AWindowPuzzle::AWindowPuzzle()
 	check(Curve.Succeeded());
 
 	FloatCurve = Curve.Object;
+
+	solution.Add(WindowStates::Open);
+	solution.Add(WindowStates::Closed);
+	solution.Add(WindowStates::Open);
+
+	currentStates.Add(WindowStates::Closed);
+	currentStates.Add(WindowStates::Closed);
+	currentStates.Add(WindowStates::Closed);
+
+	windowOrder.Add(LeftWindowBottom);
+	windowOrder.Add(CenterWindowBottom);
+	windowOrder.Add(RightWindowBottom);
 }
 
 void AWindowPuzzle::OnInteract_Implementation()
@@ -60,25 +73,63 @@ void AWindowPuzzle::OnInteract_Implementation()
 	{
 		case Windows::LEFT:
 			Timeline->SetPropertySetObject(LeftWindowBottom);
-			LeftWindowBottom->GetRelativeTransform().GetLocation() == FVector::ZeroVector
-				? Timeline->PlayFromStart()
-				: Timeline->ReverseFromEnd();
+			if (LeftWindowBottom->GetRelativeTransform().GetLocation() == FVector::ZeroVector)
+			{
+				Timeline->PlayFromStart();
+				currentStates[0] = WindowStates::Open;
+			}
+			else
+			{
+				Timeline->ReverseFromEnd();
+				currentStates[0] = WindowStates::Closed;
+			}
 			break;
 		case Windows::RIGHT:
 			Timeline->SetPropertySetObject(RightWindowBottom);
-			RightWindowBottom->GetRelativeTransform().GetLocation() == FVector::ZeroVector
-				? Timeline->PlayFromStart()
-				: Timeline->ReverseFromEnd();
+			if (RightWindowBottom->GetRelativeTransform().GetLocation() == FVector::ZeroVector)
+			{
+				Timeline->PlayFromStart();
+				currentStates[2] = WindowStates::Open;
+			}
+			else
+			{
+				Timeline->ReverseFromEnd();
+				currentStates[2] = WindowStates::Closed;
+			}
 			break;
 		case Windows::CENTER:
 			Timeline->SetPropertySetObject(CenterWindowBottom);
-			CenterWindowBottom->GetRelativeTransform().GetLocation() == FVector::ZeroVector
-				? Timeline->PlayFromStart()
-				: Timeline->ReverseFromEnd();
+			if (CenterWindowBottom->GetRelativeTransform().GetLocation() == FVector::ZeroVector)
+			{
+				Timeline->PlayFromStart();
+				currentStates[1] = WindowStates::Open;
+			}
+			else
+			{
+				Timeline->ReverseFromEnd();
+				currentStates[1] = WindowStates::Closed;
+			}
 			break;
 	}
+
+	CheckSolution();
 }
 
+void AWindowPuzzle::CheckSolution()
+{
+	if (currentStates != solution)
+	{
+		return;
+	}
+
+	FMessage message;
+	message.room = roomPuzzleUnlocks;
+	message.puzzleType = puzzleType;
+	messenger->PuzzleSolved(message);
+	message.interact = this;
+	messenger->RemoveInteractTarget(message);
+	isSolved = true;
+}
 void AWindowPuzzle::HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (IsPlayerOverlapping() && !isSolved)
@@ -131,9 +182,7 @@ void AWindowPuzzle::BeginPlay()
 		Timeline->SetPlaybackPosition(0.0f, false);
 		//Add the float curve to the timeline and connect it to your timelines's interpolation function
 		onTimelineCallback.BindUFunction(this, FName{ TEXT("TimelineCallback") });
-		onTimelineFinishedCallback.BindUFunction(this, FName{ TEXT("TimelineFinishedCallback") });
 		Timeline->AddInterpFloat(FloatCurve, onTimelineCallback);
-		Timeline->SetTimelineFinishedFunc(onTimelineFinishedCallback);
 		Timeline->RegisterComponent();
 	}
 }
@@ -170,7 +219,15 @@ void AWindowPuzzle::TimelineCallback(float interpolatedVal)
 	}
 }
 
-void AWindowPuzzle::TimelineFinishedCallback()
+void AWindowPuzzle::InitPuzzleState()
 {
-	// This function is called when the timeline finishes playing.
+	int count = windowOrder.Num();
+	for (int i = 0; i < count; ++i)
+	{
+		currentStates[i] = solution[i];
+		if (currentStates[i] == WindowStates::Open)
+		{
+			windowOrder[i]->SetRelativeLocation(FVector(0, 0, 50));
+		}
+	}
 }

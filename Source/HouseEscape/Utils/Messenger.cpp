@@ -54,3 +54,8 @@ void UMessenger::InventoryItemSelected(FMessage message)
 {
 	OnInventoryItemSelected.Broadcast(message);
 }
+
+void UMessenger::ItemRemoved(FMessage message)
+{
+	OnItemRemoved.Broadcast(message);
+}

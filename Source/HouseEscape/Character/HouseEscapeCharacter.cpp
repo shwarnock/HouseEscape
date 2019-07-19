@@ -9,6 +9,7 @@
 #include "HouseEscapeGameInstance.h"
 #include "Enums.h"
 #include "Door.h"
+#include "ItemBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "InteractInterface.h"
 
@@ -55,11 +56,15 @@ void AHouseEscapeCharacter::BeginPlay()
 
 	StaticMesh->SetHiddenInGame(false, true);
 
-	messenger = Cast<UHouseEscapeGameInstance>(GetWorld()->GetGameInstance())->GetMessenger();
-	messenger->OnItemPickedUp.AddDynamic(this, &AHouseEscapeCharacter::HandleItemPickedUp);
+	UHouseEscapeGameInstance* gameInstance = Cast<UHouseEscapeGameInstance>(GetWorld()->GetGameInstance());
+	messenger = gameInstance->GetMessenger();
 	messenger->OnAddInteractTarget.AddDynamic(this, &AHouseEscapeCharacter::AddInteractTarget);
 	messenger->OnRemoveInteract.AddDynamic(this, &AHouseEscapeCharacter::RemoveInteractTarget);
 	messenger->OnInventoryItemSelected.AddDynamic(this, &AHouseEscapeCharacter::SetLastItemSelected);
+	messenger->OnItemRemoved.AddDynamic(this, &AHouseEscapeCharacter::ClearLastItemSelected);
+	messenger->OnPuzzleSolved.AddDynamic(this, &AHouseEscapeCharacter::RemoveInteractTarget);
+
+	saveGameUtil = gameInstance->GetSaveGameUtil();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -85,18 +90,10 @@ void AHouseEscapeCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 
 void AHouseEscapeCharacter::OnInteract()
 {
-	if (currentTargets.Num() == 0)
+	if (mostDesirableTarget != nullptr)
 	{
-		return;
+		IInteractInterface::Execute_OnInteract(mostDesirableTarget);
 	}
-
-	if (currentTargets.Num() == 1)
-	{
-		IInteractInterface::Execute_OnInteract(currentTargets[0]);
-		return;
-	}
-
-	IInteractInterface::Execute_OnInteract(AInteractable::FindMostDesirableTarget(currentTargets, this));
 }
 
 void AHouseEscapeCharacter::MoveForward(float Value)
@@ -129,14 +126,12 @@ void AHouseEscapeCharacter::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
-void AHouseEscapeCharacter::HandleItemPickedUp(FMessage message)
-{
-	items.Add(message.itemInfo);
-}
-
 void AHouseEscapeCharacter::AddInteractTarget(FMessage message)
 {
-	currentTargets.Add(message.interact);
+	if (!currentTargets.Contains(message.interact))
+	{
+		currentTargets.Add(message.interact);
+	}
 	isOverlapping = true;
 	AInteractable* tempTarget = AInteractable::FindMostDesirableTarget(currentTargets, this);
 	
@@ -162,8 +157,8 @@ void AHouseEscapeCharacter::AddInteractTarget(FMessage message)
 
 void AHouseEscapeCharacter::RemoveInteractTarget(FMessage message)
 {
-	currentTargets.Remove(message.interact);
 	mostDesirableTarget->SetRenderDepth(false);
+	currentTargets.Remove(message.interact);
 	if (currentTargets.Num() == 0)
 	{
 		isOverlapping = false;
@@ -196,14 +191,19 @@ void AHouseEscapeCharacter::Tick(float DeltaSeconds)
 {
 	if (FirstPersonCameraComponent->GetForwardVector() != CameraForward && AnyCurrentTargets())
 	{
+		CameraForward = FirstPersonCameraComponent->GetForwardVector();
 		AInteractable* tempMostDesirable = AInteractable::FindMostDesirableTarget(currentTargets, this);
 		if (!tempMostDesirable)
 		{
+			mostDesirableTarget->SetRenderDepth(false);
+			isOverlapping = false;
+			mostDesirableTarget = nullptr;
+			FMessage message;
+			messenger->EndCollideWithInteractable(message);
 			return;
 		}
 		if (mostDesirableTarget != tempMostDesirable)
 		{
-			CameraForward = FirstPersonCameraComponent->GetForwardVector();
 			mostDesirableTarget->SetRenderDepth(false);
 			mostDesirableTarget = tempMostDesirable;
 			mostDesirableTarget->SetRenderDepth(true);
@@ -220,6 +220,10 @@ void AHouseEscapeCharacter::Tick(float DeltaSeconds)
 
 void AHouseEscapeCharacter::OnInventory()
 {
+	FMessage message;
+	message.items = saveGameUtil->GetSaveGame()->items;
+	messenger->ToggleInventory(message);
+
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (IsInventoryOpen)
 	{
@@ -233,12 +237,8 @@ void AHouseEscapeCharacter::OnInventory()
 		playerController->bEnableMouseOverEvents = true;
 		playerController->bShowMouseCursor = true;
 		playerController->bEnableClickEvents = true;
-		playerController->SetInputMode(FInputModeGameAndUI());
+		//playerController->SetInputMode(FInputModeGameAndUI());
 	}
-
-	FMessage message;
-	message.items = items;
-	messenger->ToggleInventory(message);
 	IsInventoryOpen = !IsInventoryOpen;
 }
 
@@ -250,4 +250,9 @@ void AHouseEscapeCharacter::SetLastItemSelected(FMessage message)
 FItem AHouseEscapeCharacter::GetLastSelectedItem()
 {
 	return lastItemSelected;
+}
+
+void AHouseEscapeCharacter::ClearLastItemSelected(FMessage message)
+{
+	lastItemSelected = AItemBase::EmptyItem();
 }

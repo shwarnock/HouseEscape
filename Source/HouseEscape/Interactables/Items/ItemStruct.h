@@ -8,7 +8,8 @@ class AItemBase;
 UENUM(BlueprintType)
 enum ItemType
 {
-	Screwdriver
+	Screwdriver,
+	Empty
 };
 
 USTRUCT(BlueprintType)
@@ -30,6 +31,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int itemIndex;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	AItemBase* baseClass;
+	bool operator == (FItem const& item)
+	{
+		if (this->itemIndex == item.itemIndex && 
+			this->itemType == item.itemType && 
+			this->name.EqualTo(item.name) && 
+			this->texture == item.texture)
+		{
+			return true;
+		}
+
+		return false;
+	}
 };

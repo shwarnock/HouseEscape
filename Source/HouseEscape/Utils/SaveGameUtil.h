@@ -23,7 +23,7 @@ private:
 
 	UMessenger* messenger;
 
-	void InitDoorStates();
+	FString SaveGameName;
 
 public:
 	void CreateSaveGame();
@@ -44,4 +44,25 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	TMap<TEnumAsByte<Puzzles>, bool> GetPuzzleStates();
+
+	UFUNCTION(BlueprintCallable)
+	void SetSaveGameName(FString name);
+
+	UFUNCTION(BlueprintCallable)
+	void DeleteSaveGame(FString name);
+
+	void AddPlayTime(FTimespan duration);
+
+	void SaveGame();
+
+	UFUNCTION(BlueprintCallable)
+	static FString GetTotalPlayTime(FString name);
+
+	UFUNCTION()
+	void HandleItemPickedUp(FMessage message);
+
+	UFUNCTION()
+	void HandleItemRemoved(FMessage message);
+
+	bool DoesPlayHaveItem(FItem item);
 };

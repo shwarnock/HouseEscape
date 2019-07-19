@@ -61,11 +61,18 @@ private:
 	UFUNCTION()
 	void TimelineCallback(float val);
 
-	UFUNCTION()
-	void TimelineFinishedCallback();
-
 	UPROPERTY()
 	TEnumAsByte<ETimelineDirection::Type> TimelineDirection;
 
 	void Tick(float DeltaTime) override;
+
+	enum WindowStates { Closed, Open };
+
+	TArray<WindowStates> currentStates;
+	TArray<WindowStates> solution;
+	TArray<UStaticMeshComponent*> windowOrder;
+
+	void CheckSolution();
+
+	void InitPuzzleState() override;
 };
