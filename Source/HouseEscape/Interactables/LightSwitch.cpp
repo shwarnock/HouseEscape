@@ -18,7 +18,7 @@ void ALightSwitch::OnInteract_Implementation()
 		SwitchFlip->SetRelativeRotation(FRotator(0, 0, -45));
 	}
 
-	if (pointLight2 != nullptr)
+	if (pointLight2 == nullptr)
 	{
 		return;
 	}

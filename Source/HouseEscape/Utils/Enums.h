@@ -8,7 +8,9 @@ enum Rooms
 {
 	BasementFrontCenterRoom = 0,
 	BasementFrontRight = 1,
-	BasementBackLeftRoom = 2
+	BasementBackLeftRoom = 2,
+	BasementCenterRoom = 3,
+	BasementFrontLeftRoom = 4
 };
 
 UENUM(BlueprintType)
@@ -36,5 +38,6 @@ enum Puzzles
 	WirePuzzle = 0,
 	VentPuzzle = 1,
 	WindowPuzzle = 2,
-	None = 3
+	ComboPuzzle = 3,
+	None = 4
 };

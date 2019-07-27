@@ -3,11 +3,10 @@
 #include "CoreMinimal.h"
 #include "Enums.h"
 #include "ItemStruct.h"
-#include "Components/StaticMeshComponent.h"
 #include "MessageStruct.generated.h"
 
 class AInteractable;
-
+class UComboPuzzleComp;
 USTRUCT(BlueprintType)
 struct FMessage
 {
@@ -37,4 +36,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<FItem> items;
+
+	UPROPERTY()
+	UComboPuzzleComp* comp;
 };

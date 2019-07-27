@@ -18,6 +18,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateInteractUIDelegate, FMessage,
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FToggleInventoryDelegate, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemSelected, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemRemovedDelegate, FMessage, message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOverlapComboPuzzleComp, FMessage, message);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEndOverlapComboPuzzleComp, FMessage, message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRemoveAllWidgetsDelegate);
 
 UCLASS(BlueprintType)
@@ -62,6 +64,12 @@ public:
 	UPROPERTY()
 	FItemRemovedDelegate OnItemRemoved;
 
+	UPROPERTY()
+	FOverlapComboPuzzleComp OnOverlapPuzzleComp;
+
+	UPROPERTY()
+	FEndOverlapComboPuzzleComp OnEndOverlapPuzzleComp;
+
 public:
 	void CollideWithInteractable(FMessage message);
 	void EndCollideWithInteractable(FMessage message);
@@ -89,4 +97,8 @@ public:
 	void InventoryItemSelected(FMessage message);
 
 	void ItemRemoved(FMessage message);
+
+	void OverlapPuzzleComp(FMessage message);
+
+	void EndOverlapPuzzleComp(FMessage message);
 };

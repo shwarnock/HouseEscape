@@ -107,7 +107,7 @@ AInteractable* AInteractable::FindMostDesirableTarget(TArray<AInteractable*> int
 
 	if (interactables.Num() == 1)
 	{
-		FVector vec = (interactables[0]->GetActorLocation() - playerLocation);
+		FVector vec = (interactables[0]->meshToRender->GetComponentLocation() - playerLocation);
 		vec.Normalize();
 		return FVector::DotProduct(playerForward, vec) > 0 ? interactables[0] : nullptr;
 	}
@@ -118,7 +118,7 @@ AInteractable* AInteractable::FindMostDesirableTarget(TArray<AInteractable*> int
 	int loopCutOff = -1;
 	for (int i = 0; i < interactables.Num(); ++i)
 	{
-		firstVec = (interactables[i]->GetActorLocation() - playerLocation);
+		firstVec = (interactables[i]->meshToRender->GetComponentLocation() - playerLocation);
 		firstVec.Normalize();
 		firstDot = FVector::DotProduct(playerForward, firstVec);
 		if (firstDot > 0)
@@ -137,7 +137,7 @@ AInteractable* AInteractable::FindMostDesirableTarget(TArray<AInteractable*> int
 	int count = interactables.Num();
 	for (int i = loopCutOff + 1; i < count; ++i)
 	{
-		FVector secVec = (interactables[i]->GetActorLocation() - playerLocation);
+		FVector secVec = (interactables[i]->meshToRender->GetComponentLocation() - playerLocation);
 		secVec.Normalize();
 		float secVecDot = FVector::DotProduct(playerForward, secVec);
 

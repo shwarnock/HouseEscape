@@ -59,3 +59,13 @@ void UMessenger::ItemRemoved(FMessage message)
 {
 	OnItemRemoved.Broadcast(message);
 }
+
+void UMessenger::OverlapPuzzleComp(FMessage message)
+{
+	OnOverlapPuzzleComp.Broadcast(message);
+}
+
+void UMessenger::EndOverlapPuzzleComp(FMessage message)
+{
+	OnEndOverlapPuzzleComp.Broadcast(message);
+}

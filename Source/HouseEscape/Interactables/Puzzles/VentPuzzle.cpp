@@ -80,7 +80,7 @@ AVentPuzzle::AVentPuzzle()
 	CameraComponent->SetRelativeLocation(FVector(0, 100, 0));
 	CameraComponent->SetRelativeRotation(FRotator(180, 90, 180));
 
-	meshToRender = TopLeftScrew;
+	meshToRender = Grate;
 
 	BoxComponent->SetBoxExtent(FVector(80, 80, 32));
 	BoxComponent->SetRelativeLocation(FVector(0, 70, 0));
