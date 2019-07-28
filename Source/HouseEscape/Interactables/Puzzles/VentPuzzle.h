@@ -41,6 +41,9 @@ class HOUSEESCAPE_API AVentPuzzle : public APuzzle
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* Bottom;
+
+	UPROPERTY(EditAnywhere)
+	UCameraComponent* CameraComponent;
 	
 public:
 	AVentPuzzle();

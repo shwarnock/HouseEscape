@@ -37,6 +37,9 @@ class HOUSEESCAPE_API AWirePuzzle : public APuzzle
 	UPROPERTY()
 	UWirePuzzleMeshComponent* GreenB;
 
+	UPROPERTY(EditAnywhere)
+	UCameraComponent* CameraComponent;
+
 public:
 	AWirePuzzle();
 

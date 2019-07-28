@@ -39,5 +39,6 @@ enum Puzzles
 	VentPuzzle = 1,
 	WindowPuzzle = 2,
 	ComboPuzzle = 3,
-	None = 4
+	PuzzleBoard = 4,
+	None = 5
 };

@@ -36,9 +36,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte<Puzzles> puzzleType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UCameraComponent* CameraComponent;
-
 	virtual void CheckSolution();
 
 	bool isSolved;
