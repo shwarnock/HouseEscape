@@ -10,6 +10,7 @@
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
+#include "Materials/MaterialInterface.h"
 #include "GameFramework/Character.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Components/StaticMeshComponent.h"

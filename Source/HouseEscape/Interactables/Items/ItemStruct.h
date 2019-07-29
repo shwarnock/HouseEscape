@@ -9,6 +9,9 @@ UENUM(BlueprintType)
 enum ItemType
 {
 	Screwdriver,
+	PuzzlePieceA,
+	PuzzlePieceB,
+	PuzzlePieceC,
 	Empty
 };
 
